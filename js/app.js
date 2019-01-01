@@ -13,18 +13,23 @@ $(document).ready(function () {
         var books = $("#title-list");
         books.empty();
         $.ajax({
-            url: "http://localhost:8282/books",
+            url: "http://localhost:8080/books",
             data: {},
             type: "GET",
             dataType: "json"
         }).done(function(result) {
             for (var i = 0; i < result.length; i++) {
                 var book = result[i]
-                var li = $("<li>").html(book.title).appendTo(books).attr('book-id', book.id);
+                var li = $("<li class='book'>").html(book.title).appendTo(books).attr('book-id', book.id);
+                var info = $("<button>SHOW INFO</button>").appendTo(li).attr('book-id', book.id);
+                var update = $("<button>MODIFY</button>").appendTo(li).attr('book-id', book.id);
                 var del = $("<button>DELETE</button>").appendTo(li).attr('book-id', book.id);
                 $("<div>").appendTo(books);
-                li.one("click", function () {
+                info.one("click", function () {
                     showInfo($(this).attr('book-id'));
+                })
+                update.one("click", function () {
+                    updateBook($(this).attr('book-id'), "Nowy Tytuł", "Nowy Autor", "Nowy Wydawca", "Zmieniony Typ", "Zmieniony ISBN");
                 })
                 del.one("click", function () {
                     deleteBook($(this).attr('book-id'));
@@ -36,12 +41,12 @@ $(document).ready(function () {
     }
     function showInfo(bookId) {
         $.ajax({
-            url: "http://localhost:8282/books/"+bookId,
+            url: "http://localhost:8080/books/"+bookId,
             data: {},
             type: "GET",
             dataType: "json"
         }).done(function(result) {
-            var list = $("<ul>").appendTo($("[book-id="+bookId+"]").next());
+            var list = $("<ul>").appendTo($(".book[book-id="+bookId+"]"));
             $("<li>").html("Author: "+result.author).appendTo(list);
             $("<li>").html("Title: "+result.title).appendTo(list);
             $("<li>").html("Publisher: "+result.publisher).appendTo(list);
@@ -53,7 +58,7 @@ $(document).ready(function () {
     }
     function addNewBook(title, author, publisher, type, isbn) {
         $.ajax({
-            url: "http://localhost:8282/books",
+            url: "http://localhost:8080/books",
             data: JSON.stringify({"title":title ,"author":author,
                 "publisher":publisher,"type":type,
                 "isbn":isbn}),
@@ -69,9 +74,27 @@ $(document).ready(function () {
             console.log(err);
         });
     }
+    function updateBook(id, title, author, publisher, type, isbn) {
+        $.ajax({
+            url: "http://localhost:8080/books",
+            data: JSON.stringify({"id":id, "title":title ,"author":author,
+                "publisher":publisher,"type":type,
+                "isbn":isbn}),
+            type: "PUT",
+            dataType: "json",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }).done(function(result) {
+            showBooks();
+        }).fail(function(xhr,status,err) {
+            console.log(err);
+        });
+    }
     function deleteBook(bookId) {
             $.ajax({
-                url: "http://localhost:8282/books/"+bookId,
+                url: "http://localhost:8080/books/"+bookId,
                 data: {},
                 type: "DELETE",
                 dataType: "json"
