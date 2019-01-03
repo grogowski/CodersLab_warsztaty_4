@@ -9,15 +9,17 @@ $(document).ready(function () {
             form.find("#type").val(),
             form.find("#isbn").val());
     });
+
     function showBooks() {
         var books = $("#title-list");
         books.empty();
         $.ajax({
+            cache: false,
             url: "http://localhost:8080/books",
             data: {},
             type: "GET",
             dataType: "json"
-        }).done(function(result) {
+        }).done(function (result) {
             for (var i = 0; i < result.length; i++) {
                 var book = result[i]
                 var li = $("<li class='book'>").html(book.title).appendTo(books).attr('book-id', book.id);
@@ -35,77 +37,82 @@ $(document).ready(function () {
                     deleteBook($(this).attr('book-id'));
                 })
             }
-        }).fail(function(xhr,status,err) {
+        }).fail(function (xhr, status, err) {
             console.log(err);
         });
     }
+
     function showInfo(bookId) {
         $.ajax({
-            url: "http://localhost:8080/books/"+bookId,
+            cache: false,
+            url: "http://localhost:8080/books/" + bookId,
             data: {},
             type: "GET",
             dataType: "json"
-        }).done(function(result) {
-            var list = $("<ul>").appendTo($(".book[book-id="+bookId+"]"));
-            $("<li>").html("Author: "+result.author).appendTo(list);
-            $("<li>").html("Title: "+result.title).appendTo(list);
-            $("<li>").html("Publisher: "+result.publisher).appendTo(list);
-            $("<li>").html("Type: "+result.type).appendTo(list);
-            $("<li>").html("ISBN: "+result.isbn).appendTo(list);
-        }).fail(function(xhr,status,err) {
+        }).done(function (result) {
+            var list = $("<ul>").appendTo($(".book[book-id=" + bookId + "]"));
+            $("<li>").html("Author: " + result.author).appendTo(list);
+            $("<li>").html("Title: " + result.title).appendTo(list);
+            $("<li>").html("Publisher: " + result.publisher).appendTo(list);
+            $("<li>").html("Type: " + result.type).appendTo(list);
+            $("<li>").html("ISBN: " + result.isbn).appendTo(list);
+        }).fail(function (xhr, status, err) {
             console.log(err);
         });
     }
+
     function addNewBook(title, author, publisher, type, isbn) {
         $.ajax({
+            cache: false,
             url: "http://localhost:8080/books",
-            data: JSON.stringify({"title":title ,"author":author,
-                "publisher":publisher,"type":type,
-                "isbn":isbn}),
+            data: JSON.stringify({
+                "title": title, "author": author,
+                "publisher": publisher, "type": type,
+                "isbn": isbn
+            }),
             type: "POST",
-            dataType: "json",
             headers: {
-                'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
-        }).done(function(result) {
+        }).done(function (result) {
             showBooks();
-        }).fail(function(xhr,status,err) {
+        }).fail(function (xhr, status, err) {
             console.log(err);
         });
     }
+
     function updateBook(id, title, author, publisher, type, isbn) {
         $.ajax({
+            cache: false,
             url: "http://localhost:8080/books",
-            data: JSON.stringify({"id":id, "title":title ,"author":author,
-                "publisher":publisher,"type":type,
-                "isbn":isbn}),
+            data: JSON.stringify({
+                "id": id, "title": title, "author": author,
+                "publisher": publisher, "type": type,
+                "isbn": isbn
+            }),
             type: "PUT",
-            dataType: "json",
             headers: {
-                'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
-        }).done(function(result) {
+        }).done(function (result) {
             showBooks();
-        }).fail(function(xhr,status,err) {
+        }).fail(function (xhr, status, err) {
             console.log(err);
         });
     }
+
     function deleteBook(bookId) {
-            $.ajax({
-                url: "http://localhost:8080/books/"+bookId,
-                data: {},
-                type: "DELETE",
-                dataType: "json"
-            }).done(function(result) {
-                showBooks();
-            }).fail(function(xhr,status,err) {
-                console.log(err);
-            });
+        $.ajax({
+            cache: false,
+            url: "http://localhost:8080/books/" + bookId,
+            data: {},
+            type: "DELETE"
+        }).done(function (result) {
+            showBooks();
+        }).fail(function (xhr, status, err) {
+            console.log(err);
+        });
     }
-
-
 
 
 });
